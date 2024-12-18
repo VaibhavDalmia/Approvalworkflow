@@ -1,73 +1,210 @@
-from flask import Flask, request, redirect, flash, render_template_string
+from flask import Flask, render_template_string, request, redirect, flash
 import smtplib
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
-from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired
 
 app = Flask(__name__)
-app.secret_key = "a8acada22418a9128a35361b1fe528ee"  # Replace with a secure secret key
+app.secret_key = "a8acada22418a9128a35361b1fe528ee"  # Secure key
 
 # Email Settings
 SMTP_SERVER = "smtp.office365.com"
 SMTP_PORT = 587
-EMAIL_ADDRESS = "srivastava.vaibha@dalmiabharat.com"  # Replace with your email
-APP_PASSWORD = "vylwscmnzwtvqhhf"  # Replace with your App Password
+EMAIL_ADDRESS = "srivastava.vaibha@dalmiabharat.com"  # Your Outlook email
+APP_PASSWORD = "vylwscmnzwtvqhhf"  # Your App Password
 
-# Hosted URL of your application
-HOSTED_URL = "https://approvalworkflow.onrender.com"  # Replace with your Render URL
+# Approval Tracking (for demonstration; replace with a database in production)
+approval_status = {}
+approval_data = {}  # To store the details of submitted requests
 
+# HTML Templates
+form_template = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval Form</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .form-container {
+            background: #ffffff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            max-width: 400px;
+            width: 100%;
+        }
+        h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .flash {
+            text-align: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            color: white;
+            border-radius: 4px;
+        }
+        .success { background-color: #28a745; }
+        .danger { background-color: #dc3545; }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <h2>Approval Form</h2>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="flash {{ category }}">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+        <form method="POST">
+            <label for="name">Name:</label>
+            <input type="text" name="name" id="name" required>
+            <label for="job">Job:</label>
+            <input type="text" name="job" id="job" required>
+            <label for="location">Location:</label>
+            <input type="text" name="location" id="location" required>
+            <label for="phone_number">Phone Number:</label>
+            <input type="text" name="phone_number" id="phone_number" required>
+            <button type="submit">Submit for Approval</button>
+        </form>
+    </div>
+</body>
+</html>
+"""
 
-class ApprovalForm(FlaskForm):
-    name = StringField("Name", validators=[DataRequired()])
-    job = StringField("Job", validators=[DataRequired()])
-    location = StringField("Location", validators=[DataRequired()])
-    phone_number = StringField("Phone Number", validators=[DataRequired()])
-    submit = SubmitField("Submit for Approval")
+email_template = """
+<html>
+<body>
+    <p>A new approval request has been submitted:</p>
+    <ul>
+        <li><strong>Name:</strong> {name}</li>
+        <li><strong>Job:</strong> {job}</li>
+        <li><strong>Location:</strong> {location}</li>
+        <li><strong>Phone Number:</strong> {phone_number}</li>
+    </ul>
+    <p>Click one of the buttons below to take action:</p>
+    <a href="http://127.0.0.1:5003/approve/{id}" style="text-decoration:none">
+        <button style="background-color:green;color:white;padding:10px 15px;border:none;border-radius:5px;">Approve</button>
+    </a>
+    <a href="http://127.0.0.1:5003/reject/{id}" style="text-decoration:none">
+        <button style="background-color:red;color:white;padding:10px 15px;border:none;border-radius:5px;">Reject</button>
+    </a>
+    <a href="http://127.0.0.1:5003/review/{id}" style="text-decoration:none">
+        <button style="background-color:blue;color:white;padding:10px 15px;border:none;border-radius:5px;">Review</button>
+    </a>
+</body>
+</html>
+"""
 
+review_template = """
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Review Request</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        .details {
+            background: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        h2 {
+            text-align: center;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+        }
+        ul li {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="details">
+        <h2>Approval Request Details</h2>
+        <ul>
+            <li><strong>Name:</strong> {{ name }}</li>
+            <li><strong>Job:</strong> {{ job }}</li>
+            <li><strong>Location:</strong> {{ location }}</li>
+            <li><strong>Phone Number:</strong> {{ phone_number }}</li>
+        </ul>
+    </div>
+</body>
+</html>
+"""
 
 @app.route("/", methods=["GET", "POST"])
 def approval_form():
-    form = ApprovalForm()
-    if form.validate_on_submit():
-        name = form.name.data
-        job = form.job.data
-        location = form.location.data
-        phone_number = form.phone_number.data
+    if request.method == "POST":
+        # Extract form data
+        name = request.form["name"]
+        job = request.form["job"]
+        location = request.form["location"]
+        phone_number = request.form["phone_number"]
+
+        # Generate a unique ID for the request
+        request_id = f"{name}-{job}-{location}"
+        approval_status[request_id] = "Pending"
+        approval_data[request_id] = {"name": name, "job": job, "location": location, "phone_number": phone_number}
 
         # Prepare the email content
         subject = f"Approval Request for {name}"
-        body = f"""
-        <html>
-        <body>
-            <h3>A new approval request has been submitted:</h3>
-            <ul>
-                <li><strong>Name:</strong> {name}</li>
-                <li><strong>Job:</strong> {job}</li>
-                <li><strong>Location:</strong> {location}</li>
-                <li><strong>Phone Number:</strong> {phone_number}</li>
-            </ul>
-            <p>Please review the request using the button below:</p>
-            <a href="{HOSTED_URL}/review?name={name}&job={job}&location={location}&phone_number={phone_number}" 
-               style="padding:10px 15px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">Review</a>
-            <br><br>
-            <p>Alternatively, you can directly approve or reject:</p>
-            <a href="{HOSTED_URL}/approve?name={name}" 
-               style="padding:10px 15px; background-color: #007bff; color: white; text-decoration: none; border-radius: 5px;">Approve</a>
-            <a href="{HOSTED_URL}/reject?name={name}" 
-               style="padding:10px 15px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 5px;">Reject</a>
-        </body>
-        </html>
-        """
+        body = email_template.format(
+            name=name,
+            job=job,
+            location=location,
+            phone_number=phone_number,
+            id=request_id
+        )
 
         try:
             # Send email
-            msg = MIMEMultipart()
+            msg = MIMEMultipart("alternative")
             msg["From"] = EMAIL_ADDRESS
-            msg["To"] = "approver_email@domain.com"  # Replace with approver's email
+            msg["To"] = "das.rajesh@dalmiabharat.com"  # Replace with the approver's email
             msg["Subject"] = subject
-            msg.attach(MIMEText(body, "html"))  # Send email as HTML
+            msg.attach(MIMEText(body, "html"))
 
             server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
             server.starttls()
@@ -80,99 +217,34 @@ def approval_form():
             flash(f"Error sending email: {e}", "danger")
 
         return redirect("/")
+    return render_template_string(form_template)
 
-    # Render the form in the root page
-    return render_template_string("""
-    <!DOCTYPE html>
-    <html>
-    <head>
-        <title>Approval Workflow</title>
-        <style>
-            body {
-                font-family: Arial, sans-serif;
-                margin: 50px;
-            }
-            .form-container {
-                width: 50%;
-                margin: auto;
-                padding: 20px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            }
-            label {
-                display: block;
-                margin-top: 10px;
-                font-weight: bold;
-            }
-            input {
-                width: 100%;
-                padding: 10px;
-                margin-top: 5px;
-                border: 1px solid #ddd;
-                border-radius: 5px;
-            }
-            button {
-                margin-top: 20px;
-                padding: 10px 15px;
-                background-color: #007bff;
-                color: white;
-                border: none;
-                border-radius: 5px;
-                cursor: pointer;
-            }
-            button:hover {
-                background-color: #0056b3;
-            }
-        </style>
-    </head>
-    <body>
-        <div class="form-container">
-            <h2>Approval Request Form</h2>
-            <form method="post">
-                {{ form.hidden_tag() }}
-                <label for="name">Name:</label>
-                {{ form.name() }}
-                <label for="job">Job:</label>
-                {{ form.job() }}
-                <label for="location">Location:</label>
-                {{ form.location() }}
-                <label for="phone_number">Phone Number:</label>
-                {{ form.phone_number() }}
-                {{ form.submit(class_="btn btn-primary") }}
-            </form>
-        </div>
-    </body>
-    </html>
-    """, form=form)
+@app.route("/approve/<request_id>")
+def approve(request_id):
+    if request_id in approval_status:
+        approval_status[request_id] = "Approved"
+        flash(f"Request {request_id} has been approved.", "success")
+    else:
+        flash("Invalid approval request.", "danger")
+    return redirect("/")
 
+@app.route("/reject/<request_id>")
+def reject(request_id):
+    if request_id in approval_status:
+        approval_status[request_id] = "Rejected"
+        flash(f"Request {request_id} has been rejected.", "danger")
+    else:
+        flash("Invalid rejection request.", "danger")
+    return redirect("/")
 
-@app.route("/review")
-def review():
-    name = request.args.get("name")
-    job = request.args.get("job")
-    location = request.args.get("location")
-    phone_number = request.args.get("phone_number")
-    return f"""
-    <h2>Review Request</h2>
-    <p><strong>Name:</strong> {name}</p>
-    <p><strong>Job:</strong> {job}</p>
-    <p><strong>Location:</strong> {location}</p>
-    <p><strong>Phone Number:</strong> {phone_number}</p>
-    """
-
-
-@app.route("/approve")
-def approve():
-    name = request.args.get("name")
-    return f"<h2>Request Approved for {name}</h2>"
-
-
-@app.route("/reject")
-def reject():
-    name = request.args.get("name")
-    return f"<h2>Request Rejected for {name}</h2>"
-
+@app.route("/review/<request_id>")
+def review(request_id):
+    if request_id in approval_data:
+        data = approval_data[request_id]
+        return render_template_string(review_template, **data)
+    else:
+        flash("Invalid review request.", "danger")
+        return redirect("/")
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(port=5003, debug=True)
