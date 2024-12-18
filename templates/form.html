@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Approval Form</title>
+</head>
+<body>
+    <h2>Approval Form</h2>
+    <form action="/submit" method="post">
+        <label for="name">Name:</label><br>
+        <input type="text" id="name" name="name" required><br>
+
+        <label for="email">Your Email:</label><br>
+        <input type="email" id="email" name="email" required><br>
+
+        <label for="approver_email">Approver's Email:</label><br>
+        <input type="email" id="approver_email" name="approver_email" required><br>
+
+        <label for="reason">Reason:</label><br>
+        <textarea id="reason" name="reason" required></textarea><br><br>
+
+        <input type="submit" value="Submit">
+    </form>
+</body>
+</html>

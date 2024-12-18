@@ -1,0 +1,64 @@
+2024-12-17 16:40:38,915 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2024-12-17 16:40:38,915 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-17 16:40:38,917 - INFO -  * Restarting with stat
+2024-12-17 16:40:39,462 - WARNING -  * Debugger is active!
+2024-12-17 16:40:39,466 - INFO -  * Debugger PIN: 139-992-078
+2024-12-17 16:40:54,231 - INFO - 127.0.0.1 - - [17/Dec/2024 16:40:54] "GET / HTTP/1.1" 200 -
+2024-12-17 16:41:04,593 - INFO - Form submitted: Name=Vaibhav Srivastava, Email=srivastava.vaibha@dalmiabharat.com, Reason=wefwedcw, Approver Email=vaibhav.srivastavaknp@gmail.com
+2024-12-17 16:41:04,608 - INFO - Attempting to send email...
+2024-12-17 16:41:11,302 - ERROR - SMTP Authentication Error: (535, b'5.7.139 Authentication unsuccessful, the request did not meet the criteria to be authenticated successfully. Contact your administrator. [PN2PR01CA0074.INDPRD01.PROD.OUTLOOK.COM 2024-12-17T11:11:11.172Z 08DD1DF0D8C221C7]')
+2024-12-17 16:41:11,302 - INFO - 127.0.0.1 - - [17/Dec/2024 16:41:11] "POST /submit HTTP/1.1" 200 -
+2024-12-17 16:44:00,286 - INFO -  * Detected change in 'C:\\Users\\Srivastava.Vaibha\\PycharmProjects\\ApprovalWorkflow\\app.py', reloading
+2024-12-17 16:44:00,536 - INFO -  * Restarting with stat
+2024-12-17 16:44:02,030 - WARNING -  * Debugger is active!
+2024-12-17 16:44:02,032 - INFO -  * Debugger PIN: 139-992-078
+2024-12-17 23:59:53,604 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2024-12-17 23:59:53,605 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-17 23:59:53,607 - INFO -  * Restarting with stat
+2024-12-17 23:59:54,804 - WARNING -  * Debugger is active!
+2024-12-17 23:59:54,811 - INFO -  * Debugger PIN: 139-992-078
+2024-12-18 00:00:01,514 - INFO - 127.0.0.1 - - [18/Dec/2024 00:00:01] "GET / HTTP/1.1" 200 -
+2024-12-18 00:00:01,826 - INFO - 127.0.0.1 - - [18/Dec/2024 00:00:01] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+2024-12-18 00:00:35,326 - INFO - Form submitted: Name=Vaibhav, Email=srivastava.vaibhav@dalmiasugar.com, Reason=abcd, Approver Email=srivastava.vaibhav@dalmiasugar.com
+2024-12-18 00:00:35,385 - INFO - Attempting to send email...
+2024-12-18 00:00:43,512 - ERROR - SMTP Authentication Error: (535, b'5.7.139 Authentication unsuccessful, account has an issue. Contact your administrator. [PN2PR01CA0225.INDPRD01.PROD.OUTLOOK.COM 2024-12-17T18:30:43.194Z 08DD1D39F68A182D]')
+2024-12-18 00:00:43,513 - INFO - 127.0.0.1 - - [18/Dec/2024 00:00:43] "POST /submit HTTP/1.1" 200 -
+2024-12-18 00:02:46,992 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2024-12-18 00:02:46,992 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-18 00:02:46,992 - INFO -  * Restarting with stat
+2024-12-18 00:02:48,113 - WARNING -  * Debugger is active!
+2024-12-18 00:02:48,122 - INFO -  * Debugger PIN: 139-992-078
+2024-12-18 00:02:54,856 - INFO - 127.0.0.1 - - [18/Dec/2024 00:02:54] "GET / HTTP/1.1" 200 -
+2024-12-18 00:03:10,389 - INFO - Form submitted: Name=Vaibahv, Email=srivastava.vaibhav@dalmiasugar.com, Reason=a, Approver Email=srivastava.vaibhav@dalmiasugar.com
+2024-12-18 00:03:10,451 - INFO - Attempting to send email...
+2024-12-18 00:03:18,522 - ERROR - SMTP Authentication Error: (535, b'5.7.139 Authentication unsuccessful, account has an issue. Contact your administrator. [PN3PR01CA0015.INDPRD01.PROD.OUTLOOK.COM 2024-12-17T18:33:18.316Z 08DD1E493894514C]')
+2024-12-18 00:03:18,523 - INFO - 127.0.0.1 - - [18/Dec/2024 00:03:18] "POST /submit HTTP/1.1" 200 -
+2024-12-18 00:03:32,519 - INFO -  * Detected change in 'C:\\Users\\Srivastava.Vaibha\\PycharmProjects\\ApprovalWorkflow\\app.py', reloading
+2024-12-18 00:03:32,573 - INFO -  * Restarting with stat
+2024-12-18 00:03:33,223 - WARNING -  * Debugger is active!
+2024-12-18 00:03:33,227 - INFO -  * Debugger PIN: 139-992-078
+2024-12-18 00:03:43,366 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2024-12-18 00:03:43,366 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-18 00:03:43,367 - INFO -  * Restarting with stat
+2024-12-18 00:03:43,909 - WARNING -  * Debugger is active!
+2024-12-18 00:03:43,914 - INFO -  * Debugger PIN: 139-992-078
+2024-12-18 00:03:52,344 - INFO - 127.0.0.1 - - [18/Dec/2024 00:03:52] "GET / HTTP/1.1" 200 -
+2024-12-18 00:03:57,903 - INFO - Form submitted: Name=Vaibhav Srivastava, Email=srivastava.vaibha@dalmiabharat.com, Reason=qfdwef, Approver Email=vaibhav.srivastavaknp@gmail.com
+2024-12-18 00:03:57,965 - INFO - Attempting to send email...
+2024-12-18 00:04:05,222 - ERROR - SMTP Authentication Error: (535, b'5.7.139 Authentication unsuccessful, the request did not meet the criteria to be authenticated successfully. Contact your administrator. [BMXPR01CA0082.INDPRD01.PROD.OUTLOOK.COM 2024-12-17T18:34:04.962Z 08DD1E125CCC2CDF]')
+2024-12-18 00:04:05,222 - INFO - 127.0.0.1 - - [18/Dec/2024 00:04:05] "POST /submit HTTP/1.1" 200 -
+2024-12-18 00:05:42,298 - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5001
+2024-12-18 00:05:42,298 - INFO - [33mPress CTRL+C to quit[0m
+2024-12-18 00:05:42,299 - INFO -  * Restarting with stat
+2024-12-18 00:05:42,777 - WARNING -  * Debugger is active!
+2024-12-18 00:05:42,780 - INFO -  * Debugger PIN: 139-992-078
+2024-12-18 00:05:50,806 - INFO - 127.0.0.1 - - [18/Dec/2024 00:05:50] "GET / HTTP/1.1" 200 -
+2024-12-18 00:05:58,670 - INFO - Form submitted: Name=Vaibhav Srivastava, Email=srivastava.vaibha@dalmiabharat.com, Reason=wdvsdv, Approver Email=vaibhav.srivastavaknp@gmail.com
+2024-12-18 00:05:58,748 - INFO - Attempting to send email...
+2024-12-18 00:05:58,748 - ERROR - General Error: encoding with 'idna' codec failed (UnicodeError: label too long)
+2024-12-18 00:05:58,748 - INFO - 127.0.0.1 - - [18/Dec/2024 00:05:58] "POST /submit HTTP/1.1" 200 -
