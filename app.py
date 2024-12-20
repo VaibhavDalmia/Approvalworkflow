@@ -12,6 +12,9 @@ SMTP_PORT = 587
 EMAIL_ADDRESS = "srivastava.vaibha@dalmiabharat.com"  # Your Outlook email
 APP_PASSWORD = "vylwscmnzwtvqhhf"  # Your App Password
 
+# Hosted URL
+HOSTED_URL = "https://approvalworkflow.onrender.com"  # Replace with your hosted URL
+
 # Approval Tracking (for demonstration; replace with a database in production)
 approval_status = {}
 approval_data = {}  # To store the details of submitted requests
@@ -37,10 +40,10 @@ form_template = """
         }
         .form-container {
             background: #ffffff;
-            padding: 20px;
+            padding: 30px;
             border-radius: 8px;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            max-width: 400px;
+            max-width: 450px;
             width: 100%;
         }
         h2 {
@@ -49,10 +52,10 @@ form_template = """
         }
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-weight: bold;
         }
-        input, button {
+        input {
             width: 100%;
             padding: 10px;
             margin-bottom: 15px;
@@ -60,10 +63,14 @@ form_template = """
             border-radius: 4px;
         }
         button {
+            width: 100%;
+            padding: 10px;
             background-color: #007bff;
             color: white;
             border: none;
+            border-radius: 5px;
             cursor: pointer;
+            font-size: 16px;
         }
         button:hover {
             background-color: #0056b3;
@@ -92,12 +99,25 @@ form_template = """
         <form method="POST">
             <label for="name">Name:</label>
             <input type="text" name="name" id="name" required>
-            <label for="job">Job:</label>
-            <input type="text" name="job" id="job" required>
-            <label for="location">Location:</label>
-            <input type="text" name="location" id="location" required>
+
             <label for="phone_number">Phone Number:</label>
             <input type="text" name="phone_number" id="phone_number" required>
+
+            <label for="address">Address:</label>
+            <input type="text" name="address" id="address" required>
+
+            <label for="gstin">GSTIN:</label>
+            <input type="text" name="gstin" id="gstin" required>
+
+            <label for="pan">PAN:</label>
+            <input type="text" name="pan" id="pan" required>
+
+            <label for="account_number">Bank Account Number:</label>
+            <input type="text" name="account_number" id="account_number" required>
+
+            <label for="ifsc_code">IFSC Code:</label>
+            <input type="text" name="ifsc_code" id="ifsc_code" required>
+
             <button type="submit">Submit for Approval</button>
         </form>
     </div>
@@ -111,18 +131,21 @@ email_template = """
     <p>A new approval request has been submitted:</p>
     <ul>
         <li><strong>Name:</strong> {name}</li>
-        <li><strong>Job:</strong> {job}</li>
-        <li><strong>Location:</strong> {location}</li>
         <li><strong>Phone Number:</strong> {phone_number}</li>
+        <li><strong>Address:</strong> {address}</li>
+        <li><strong>GSTIN:</strong> {gstin}</li>
+        <li><strong>PAN:</strong> {pan}</li>
+        <li><strong>Bank Account Number:</strong> {account_number}</li>
+        <li><strong>IFSC Code:</strong> {ifsc_code}</li>
     </ul>
     <p>Click one of the buttons below to take action:</p>
-    <a href="http://127.0.0.1:5003/approve/{id}" style="text-decoration:none">
+    <a href="{hosted_url}/approve/{id}" style="text-decoration:none">
         <button style="background-color:green;color:white;padding:10px 15px;border:none;border-radius:5px;">Approve</button>
     </a>
-    <a href="http://127.0.0.1:5003/reject/{id}" style="text-decoration:none">
+    <a href="{hosted_url}/reject/{id}" style="text-decoration:none">
         <button style="background-color:red;color:white;padding:10px 15px;border:none;border-radius:5px;">Reject</button>
     </a>
-    <a href="http://127.0.0.1:5003/review/{id}" style="text-decoration:none">
+    <a href="{hosted_url}/review/{id}" style="text-decoration:none">
         <button style="background-color:blue;color:white;padding:10px 15px;border:none;border-radius:5px;">Review</button>
     </a>
 </body>
@@ -131,71 +154,57 @@ email_template = """
 
 review_template = """
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Review Request</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-        }
-        .details {
-            background: #f9f9f9;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-        }
-        h2 {
-            text-align: center;
-        }
-        ul {
-            list-style: none;
-            padding: 0;
-        }
-        ul li {
-            margin: 10px 0;
-            font-size: 18px;
-        }
-    </style>
 </head>
 <body>
-    <div class="details">
-        <h2>Approval Request Details</h2>
-        <ul>
-            <li><strong>Name:</strong> {{ name }}</li>
-            <li><strong>Job:</strong> {{ job }}</li>
-            <li><strong>Location:</strong> {{ location }}</li>
-            <li><strong>Phone Number:</strong> {{ phone_number }}</li>
-        </ul>
-    </div>
+    <h2>Approval Request Details</h2>
+    <ul>
+        <li><strong>Name:</strong> {{ name }}</li>
+        <li><strong>Phone Number:</strong> {{ phone_number }}</li>
+        <li><strong>Address:</strong> {{ address }}</li>
+        <li><strong>GSTIN:</strong> {{ gstin }}</li>
+        <li><strong>PAN:</strong> {{ pan }}</li>
+        <li><strong>Bank Account Number:</strong> {{ account_number }}</li>
+        <li><strong>IFSC Code:</strong> {{ ifsc_code }}</li>
+    </ul>
 </body>
 </html>
 """
+
 
 @app.route("/", methods=["GET", "POST"])
 def approval_form():
     if request.method == "POST":
         # Extract form data
         name = request.form["name"]
-        job = request.form["job"]
-        location = request.form["location"]
         phone_number = request.form["phone_number"]
+        address = request.form["address"]
+        gstin = request.form["gstin"]
+        pan = request.form["pan"]
+        account_number = request.form["account_number"]
+        ifsc_code = request.form["ifsc_code"]
 
         # Generate a unique ID for the request
-        request_id = f"{name}-{job}-{location}"
+        request_id = f"{name}-{phone_number}"
         approval_status[request_id] = "Pending"
-        approval_data[request_id] = {"name": name, "job": job, "location": location, "phone_number": phone_number}
+        approval_data[request_id] = {
+            "name": name,
+            "phone_number": phone_number,
+            "address": address,
+            "gstin": gstin,
+            "pan": pan,
+            "account_number": account_number,
+            "ifsc_code": ifsc_code
+        }
 
         # Prepare the email content
         subject = f"Approval Request for {name}"
         body = email_template.format(
-            name=name,
-            job=job,
-            location=location,
-            phone_number=phone_number,
-            id=request_id
+            name=name, phone_number=phone_number, address=address, gstin=gstin,
+            pan=pan, account_number=account_number, ifsc_code=ifsc_code,
+            id=request_id, hosted_url=HOSTED_URL
         )
 
         try:
@@ -219,6 +228,17 @@ def approval_form():
         return redirect("/")
     return render_template_string(form_template)
 
+
+@app.route("/review/<request_id>")
+def review(request_id):
+    if request_id in approval_data:
+        data = approval_data[request_id]
+        return render_template_string(review_template, **data)
+    else:
+        flash("Invalid review request.", "danger")
+        return redirect("/")
+
+
 @app.route("/approve/<request_id>")
 def approve(request_id):
     if request_id in approval_status:
@@ -227,6 +247,7 @@ def approve(request_id):
     else:
         flash("Invalid approval request.", "danger")
     return redirect("/")
+
 
 @app.route("/reject/<request_id>")
 def reject(request_id):
@@ -237,14 +258,6 @@ def reject(request_id):
         flash("Invalid rejection request.", "danger")
     return redirect("/")
 
-@app.route("/review/<request_id>")
-def review(request_id):
-    if request_id in approval_data:
-        data = approval_data[request_id]
-        return render_template_string(review_template, **data)
-    else:
-        flash("Invalid review request.", "danger")
-        return redirect("/")
 
 if __name__ == "__main__":
     app.run(port=5003, debug=True)
